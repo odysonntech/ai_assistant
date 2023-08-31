@@ -1,0 +1,129 @@
+<style>
+    .input::placeholder {
+        color: #828282;
+    }
+    .none{
+        display: none;
+    }
+    .sc3::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+    .sc3::-webkit-scrollbar-track {
+        background-color: transparent;
+        border-radius: 10px;
+    }
+    .sc3::-webkit-scrollbar-thumb {
+        background-color: #212529;
+        border-radius: 10px;
+    }
+    
+</style>
+<div class="row justify-content-md-center" style="hei">
+    <div class="col-md-6 p-10 sc3" id="res" style="height: 85vh; position:relative; overflow-y:auto;">
+        <br>
+            <h2 class="text-center text-white">AI Assistant</h2>
+                <div class="row" id="result">
+
+                    
+
+                    
+
+                </div>
+
+            
+            <div class="card bg-primary none" id="espera"  style="position:fixed; bottom:120px;left:40%;right:40%;border-radius: 50px;">
+                <div class="card-body p-2 text-white text-center">
+                    <i data-feather="square"></i> Espere un momento
+                </div>
+            </div>
+            <div class="card bg-dark"  style="position:fixed; bottom:10px;left:20%;right:20%;border-radius: 50px;">
+                <div class="card-body">
+                    <form action="#" method="post" id="form_prompt" onsubmit="return false" class="input-group" autocomplete="off">
+                        <input type="text" class="form-control text-white input form-control-lg" required placeholder="Haz tu pregunta" id="prompt" style="border-radius: 25px;background-color:#333;border:0px;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <button class="btn btn-primary btn-lg" type="submit" id="button-addon2" style="border-radius: 100px;">
+                            <i data-feather="send"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+<script>
+    feather.replace();
+    let text='';
+    $('#form_prompt').submit(function(e){
+        
+       
+        
+        $("#espera").removeClass("none");
+        let user=$('#prompt').val();
+        //text+='### Instruction: \n '+user+' \n';
+        $('#result').append(`
+        
+            <div class="col-md-12 p-10">
+                <br>
+                <div class="row">
+                    <div class="col-1 text-center text-white">
+                        <p><i data-feather="user"></i></p>
+                    </div>
+                    <div class="col-11 p-10">
+                        
+                        <p class="text-white">`+user+`</p>
+                            
+                    </div>
+                </div>
+            </div>
+        
+        `)
+        $('#prompt').val('');
+        feather.replace();
+        $("#res").animate({ scrollTop: $('#res').prop("scrollHeight")}, 1000)
+        $.ajax({
+            url: "/chat",
+            type: 'post',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+            },
+            data: {prompt:user},
+            success: function(resultado){
+                //console.log(resultado['response'])
+                let respuesta=resultado['response'];
+                //text+='### Response: '+respuesta.replace('Respuesta:', '').replace('respuesta:', '').replace('RESPUESTA:', '')+' \n';
+                console.log(text);
+                $('#result').append(`
+                    <div class="col-md-12 p-10">
+                        <br>
+                        <div class="row">
+                            <div class="col-1 text-center text-white">
+                                <p><i data-feather="cpu"></i></p>
+                            </div>
+                            <div class="col-11">
+                                <div class="card bg-primary" style="border-radius: 15px;">
+                                    <div class="card-body p-2 text-white p-10">
+                                        <p>`+respuesta+`</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                `)
+                $("#espera").addClass("none");
+                $("#res").animate({ scrollTop: $('#res').prop("scrollHeight")}, 1000)
+                //location.reload();
+                feather.replace();
+            }
+        });
+
+        
+        
+        
+    })
+
+    
+</script>
